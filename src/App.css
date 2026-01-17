@@ -1,0 +1,18 @@
+.App {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.question-block {
+  margin-bottom: 20px;
+}
+
+.option {
+  display: block;
+  margin: 5px 0;
+}
+
+.result {
+  margin-top: 20px;
+}
