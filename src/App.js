@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import './App.css';
 
 function App() {
@@ -8,10 +8,9 @@ function App() {
 
   // Fetch a new question from the backend
   const fetchQuestion = () => {
-    fetch('http://localhost:8080/api/trivia')
+    fetch('http://localhost:8080/api/questions')
       .then((res) => res.json())
       .then((data) => {
-        console.log(data)
         setQuestionObj(data);
         setSelectedAnswer('');
         setResult(null);
@@ -35,7 +34,7 @@ function App() {
       answer: selectedAnswer,
     };
     try {
-      const res = await fetch('http://localhost:8080/api/trivia', {
+      const res = await fetch('http://localhost:8080/api/checkanswers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -47,15 +46,29 @@ function App() {
     }
   };
 
-  if (!questionObj) return <div>Loading question...</div>;
+  // Build and shuffle options from correct and incorrect answers
+  const options = useMemo(() => {
+    if (!questionObj) return [];
+    return questionObj.options;
+  }, [questionObj]);
+
+  if (!questionObj)
+    return (
+      <div className="App">
+        <div className="card">
+          <p>Loading question...</p>
+        </div>
+      </div>
+    );
 
   return (
     <div className="App">
-      <h1>Trivia Quiz</h1>
-      <div className="question-block">
+      <div className="card">
+        <h1>Trivia Quiz</h1>
+        <div className="question-block">
         <p dangerouslySetInnerHTML={{ __html: questionObj.question }} />
         <form onSubmit={handleSubmit}>
-          {questionObj.options.map((opt, idx) => (
+          {options.map((opt, idx) => (
             <label key={idx} className="option">
               <input
                 type="radio"
@@ -63,28 +76,30 @@ function App() {
                 value={opt}
                 checked={selectedAnswer === opt}
                 onChange={() => handleChange(opt)}
+                disabled={result !== null}
               />
               <span dangerouslySetInnerHTML={{ __html: opt }} />
             </label>
           ))}
-          <button type="submit" disabled={!selectedAnswer}>
-            Submit
-          </button>
+          {result === null ? (
+            <button type="submit" disabled={!selectedAnswer}>
+              Submit
+            </button>
+          ) : (
+            <button type="button" onClick={fetchQuestion}>
+              Next Question
+            </button>
+          )}
         </form>
       </div>
-      {result && (
-        <div className="result">
-          <h2>Result</h2>
-          {'correct' in result && (
+        {result !== null && (
+          <div className="result">
             <p>{result.correct ? 'Correct!' : 'Incorrect!'}</p>
-          )}
-          <pre>{JSON.stringify(result, null, 2)}</pre>
-          <button onClick={fetchQuestion}>Next Question</button>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
 export default App;
-
