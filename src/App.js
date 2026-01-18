@@ -6,9 +6,11 @@ function App() {
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [result, setResult] = useState(null);
 
-  // Fetch a new question from the backend
+  const BACKEND_URL = window._env_.REACT_APP_BACKEND_URL ||'http://localhost:3000';
+
+
   const fetchQuestion = () => {
-    fetch('http://localhost:8080/api/questions')
+    fetch(`${BACKEND_URL}/api/questions`)
       .then((res) => res.json())
       .then((data) => {
         setQuestionObj(data);
@@ -34,7 +36,7 @@ function App() {
       answer: selectedAnswer,
     };
     try {
-      const res = await fetch('http://localhost:8080/api/checkanswers', {
+      const res = await fetch(`${BACKEND_URL}/api/checkanswers`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -46,7 +48,6 @@ function App() {
     }
   };
 
-  // Build and shuffle options from correct and incorrect answers
   const options = useMemo(() => {
     if (!questionObj) return [];
     return questionObj.options;
@@ -66,32 +67,32 @@ function App() {
       <div className="card">
         <h1>Trivia Quiz</h1>
         <div className="question-block">
-        <p dangerouslySetInnerHTML={{ __html: questionObj.question }} />
-        <form onSubmit={handleSubmit}>
-          {options.map((opt, idx) => (
-            <label key={idx} className="option">
-              <input
-                type="radio"
-                name="answer"
-                value={opt}
-                checked={selectedAnswer === opt}
-                onChange={() => handleChange(opt)}
-                disabled={result !== null}
-              />
-              <span dangerouslySetInnerHTML={{ __html: opt }} />
-            </label>
-          ))}
-          {result === null ? (
-            <button type="submit" disabled={!selectedAnswer}>
-              Submit
-            </button>
-          ) : (
-            <button type="button" onClick={fetchQuestion}>
-              Next Question
-            </button>
-          )}
-        </form>
-      </div>
+          <p dangerouslySetInnerHTML={{ __html: questionObj.question }} />
+          <form onSubmit={handleSubmit}>
+            {options.map((opt, idx) => (
+              <label key={idx} className="option">
+                <input
+                  type="radio"
+                  name="answer"
+                  value={opt}
+                  checked={selectedAnswer === opt}
+                  onChange={() => handleChange(opt)}
+                  disabled={result !== null}
+                />
+                <span dangerouslySetInnerHTML={{ __html: opt }} />
+              </label>
+            ))}
+            {result === null ? (
+              <button type="submit" disabled={!selectedAnswer}>
+                Submit
+              </button>
+            ) : (
+              <button type="button" onClick={fetchQuestion}>
+                Next Question
+              </button>
+            )}
+          </form>
+        </div>
         {result !== null && (
           <div className="result">
             <p>{result.correct ? 'Correct!' : 'Incorrect!'}</p>

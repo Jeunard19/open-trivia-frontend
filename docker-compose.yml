@@ -1,11 +1,12 @@
-version: '3.8'
+version: '3.9'
+
 services:
   frontend:
+    platform: linux/amd64
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: opentrivia-frontend
     ports:
       - '3000:80'
     restart: unless-stopped
-    # To connect to a backend running on the host machine,
-    # use host.docker.internal on Docker Desktop or configure a separate service.
