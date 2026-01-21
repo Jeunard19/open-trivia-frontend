@@ -26,3 +26,11 @@ The UI allows users to:
 ```bash
 docker-compose up --build
 ```
+---
+
+##  Live Deployment
+
+The application is deployed on Google Cloud Run:
+
+- **Frontend:** https://frontend-220740165367.europe-west1.run.app/
+- **Backend:** https://open-trivia-backend-220740165367.europe-west4.run.app
